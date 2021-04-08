@@ -17,3 +17,27 @@ export const compoundClient = new ApolloClient({
   cache: new InMemoryCache(),
   shouldBatch: true
 })
+
+export const aaveClient = new ApolloClient({
+  link: new HttpLink({
+    uri: 'https://api.thegraph.com/subgraphs/name/aave/governance-sybil'
+  }),
+  cache: new InMemoryCache(),
+  shouldBatch: true
+})
+
+export const poolClient = new ApolloClient({
+  link: new HttpLink({
+    uri: 'https://api.thegraph.com/subgraphs/name/pooltogether/pooltogether-governance'
+  }),
+  cache: new InMemoryCache(),
+  shouldBatch: true
+})
+
+export const radicleClient = new ApolloClient({
+  link: new HttpLink({
+    uri: 'https://api.thegraph.com/subgraphs/name/radicle-dev/radicle-governance-homestead'
+  }),
+  cache: new InMemoryCache(),
+  shouldBatch: true
+})
