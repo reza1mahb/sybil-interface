@@ -3,6 +3,7 @@ import { createAction } from '@reduxjs/toolkit'
 import { DelegateData } from './hooks'
 
 export const updateActiveProtocol = createAction<{ activeProtocol: GovernanceInfo }>('/governance/updateActiveProtocol')
+export const updateActiveToken = createAction<{ activeTokenIndex: number }>('/governance/updateActiveTokenIndex')
 export const updateFilterActive = createAction<{ filterActive: boolean }>('/governance/updateFilterActive')
 export const updateTopDelegates = createAction<{ protocolID: string; topDelegates: DelegateData[] | undefined }>(
   `/governance/updateTopDelegates`

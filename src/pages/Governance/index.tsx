@@ -2,8 +2,15 @@ import React, { useMemo } from 'react'
 import { BodyWrapper } from '../AppBody'
 import { AutoColumn } from '../../components/Column'
 import styled from 'styled-components'
-import { useGovernanceToken, useUserVotes, useUserDelegatee, useActiveProtocol } from '../../state/governance/hooks'
+import {
+  useGovernanceToken,
+  useUserVotes,
+  useUserDelegatee,
+  useActiveTokenIndex,
+  useActiveProtocol
+} from '../../state/governance/hooks'
 import Dropdown from '../../components/governance/Dropdown'
+import DropdownToken from '../../components/governance/DropdownToken'
 import { useToggleModal } from '../../state/application/hooks'
 import useENS from '../../hooks/useENS'
 import { useActiveWeb3React, useTheme } from '../../hooks'
@@ -126,6 +133,7 @@ export default function Overview() {
   // account details
   const { chainId, account } = useActiveWeb3React()
   const [activeProtocol] = useActiveProtocol()
+  const [activeTokenIndex] = useActiveTokenIndex()
   const { name: ensName } = useENS(account)
 
   // UI views
@@ -207,23 +215,26 @@ export default function Overview() {
             <Votes>
               {!govTokenBalance && <Loader />}
               {voteCount && chainId === ChainId.MAINNET && (
-                <VoteCount>
-                  <TYPE.black>
-                    <b>{voteCount.toSignificant(3)}</b> {!isMobile && 'votes'}
-                  </TYPE.black>
-                  {userDelegatee === ZERO_ADDRESS &&
-                    govTokenBalance &&
-                    JSBI.greaterThan(govTokenBalance.raw, BIG_INT_ZERO) && (
-                      <TYPE.error fontSize={14} error={true} ml="8px">
-                        (currently inactive)
-                      </TYPE.error>
+                <>
+                  {activeProtocol && activeProtocol.tokens.length > 1 && <DropdownToken />}
+                  <VoteCount>
+                    <TYPE.black>
+                      <b>{voteCount.toSignificant(3)}</b> {!isMobile && 'votes'}
+                    </TYPE.black>
+                    {userDelegatee === ZERO_ADDRESS &&
+                      govTokenBalance &&
+                      JSBI.greaterThan(govTokenBalance.raw, BIG_INT_ZERO) && (
+                        <TYPE.error fontSize={14} error={true} ml="8px">
+                          (currently inactive)
+                        </TYPE.error>
+                      )}
+                    {JSBI.equal(BIG_INT_ZERO, voteCount.raw) && (
+                      <QuestionHelper
+                        text={`Hold ${activeProtocol?.tokens[activeTokenIndex].symbol} to be be able to self-delegate or delegate to others.`}
+                      />
                     )}
-                  {JSBI.equal(BIG_INT_ZERO, voteCount.raw) && (
-                    <QuestionHelper
-                      text={`Hold ${activeProtocol?.token.symbol} to be be able to self-delegate or delegate to others.`}
-                    />
-                  )}
-                </VoteCount>
+                  </VoteCount>
+                </>
               )}
               {govTokenBalance && (
                 <span style={{ margin: '0 12px', width: 20, height: 20 }}>

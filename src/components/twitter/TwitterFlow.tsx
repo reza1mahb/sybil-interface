@@ -10,7 +10,7 @@ import { useVerifyCallback, useAllVerifiedHandles, useTweetWatcher, useAllIdenti
 import { Tweet } from 'react-twitter-widgets'
 import { Dots } from '../../theme/components'
 import { useTwitterAccount } from '../../state/user/hooks'
-import { useActiveProtocol } from '../../state/governance/hooks'
+import { useActiveProtocol, useActiveTokenIndex } from '../../state/governance/hooks'
 import TwitterAccountPreview from '../../components/twitter/TwitterAccountPreview'
 import TwitterLoginButton from './TwitterLoginButton'
 import { OffChainRequestModal } from '../TransactionConfirmationModal'
@@ -33,6 +33,7 @@ const TweetWrapper = styled.div`
 export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
   const { account } = useActiveWeb3React()
   const [activeProtocol] = useActiveProtocol()
+  const [activeTokenIndex] = useActiveTokenIndex()
 
   // monitor user inputs
   const [twitterHandle] = useTwitterAccount()
@@ -91,14 +92,14 @@ export default function TwitterFlow({ onDismiss }: { onDismiss: () => void }) {
 
   // tweet data
   const tweetCopyForLink = `${activeProtocol?.emoji ?? ''}Verifying myself as a ${activeProtocol?.social} %23${
-    activeProtocol?.token?.symbol
+    activeProtocol?.tokens[activeTokenIndex]?.symbol
   }Delegate on Sybil🏛️%0A%0Asybil.org%2F%23%2Fdelegates/${
     activeProtocol?.id
   }/${account}%0A%0Aaddr:${account}%0A%0Asig:${sig ?? ''}`
 
   // used just for display in UI
   const readableTweetCopy = `${activeProtocol?.emoji ?? ''}Verifying myself as a ${activeProtocol?.social} #${
-    activeProtocol?.token?.symbol
+    activeProtocol?.tokens[activeTokenIndex]?.symbol
   }Delegate on Sybil🏛\n sybil.org/#/delegates/${activeProtocol?.id}/${account} \n addr:${account} \n sig:${sig ?? ''}`
 
   // watch for user tweet

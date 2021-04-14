@@ -3,6 +3,7 @@ import { withRouter } from 'react-router-dom'
 import { BodyWrapper } from './AppBody'
 import {
   useActiveProtocol,
+  useActiveTokenIndex,
   useDelegateInfo,
   useGovernanceToken,
   useAllProposals,
@@ -33,7 +34,6 @@ import Loader from '../components/Loader'
 import { enumerateProposalState } from '../data/governance'
 import CopyHelper from '../components/AccountDetails/Copy'
 import { useIsEOA } from '../hooks/useIsEOA'
-import { useIsAave } from '../hooks/useContract'
 import { useToggleModal, useModalDelegatee } from '../state/application/hooks'
 import { ApplicationModal } from '../state/application/actions'
 import { BIG_INT_ZERO } from '../constants'
@@ -103,6 +103,7 @@ function DelegateInfo({
 
   const { chainId, account } = useActiveWeb3React()
   const [activeProtocol] = useActiveProtocol()
+  const [activeTokenIndex] = useActiveTokenIndex()
 
   const formattedAddress = isAddress(delegateAddress)
 
@@ -137,9 +138,6 @@ function DelegateInfo({
   const userDelegatee: string | undefined = useUserDelegatee()
   const isDelegatee =
     userDelegatee && delegateAddress ? userDelegatee.toLowerCase() === delegateAddress.toLowerCase() : false
-
-  // don't show govToken balance for Aave until multi-token support implemented in Sybil
-  const isAave = useIsAave()
 
   // get social data from Sybil list
   const identity = useIdentity(delegateAddress)
@@ -260,14 +258,12 @@ function DelegateInfo({
             </WhiteCard>
             <WhiteCard>
               <DataRow>
-                {!isAave && (
-                  <AutoColumn gap="sm">
-                    <TYPE.main fontSize="14px">{`${activeProtocol?.token.symbol} Balance`}</TYPE.main>
-                    <ResponsiveDataText>
-                      {delegateTokenBalance ? delegateTokenBalance?.toFixed(0) : <Loader />}
-                    </ResponsiveDataText>
-                  </AutoColumn>
-                )}
+                <AutoColumn gap="sm">
+                  <TYPE.main fontSize="14px">{`${activeProtocol?.tokens[activeTokenIndex]?.symbol} Balance`}</TYPE.main>
+                  <ResponsiveDataText>
+                    {delegateTokenBalance ? delegateTokenBalance?.toFixed(0) : <Loader />}
+                  </ResponsiveDataText>
+                </AutoColumn>
                 <AutoColumn gap="sm">
                   <TYPE.main fontSize="14px">Votes</TYPE.main>
                   <ResponsiveDataText>{delegatedVotes}</ResponsiveDataText>

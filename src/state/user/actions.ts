@@ -19,4 +19,7 @@ export const updateTwitterAccount = createAction<{ twitterAccount: string | unde
 export const updateLastSelectedProtocolID = createAction<{ protocolID: string | undefined }>(
   'user/updateLastSelectedProtocolID'
 )
+export const updateLastSelectedTokenIndex = createAction<{ tokenIndex: number | undefined }>(
+  'user/updateLastSelectedTokenIndex'
+)
 export const toggleURLWarning = createAction<void>('app/toggleURLWarning')

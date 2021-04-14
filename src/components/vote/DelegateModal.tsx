@@ -11,7 +11,12 @@ import { useActiveWeb3React } from '../../hooks'
 import AddressInputPanel from '../AddressInputPanel'
 import { isAddress } from 'ethers/lib/utils'
 import useENS from '../../hooks/useENS'
-import { useDelegateCallback, useGovernanceToken, useActiveProtocol } from '../../state/governance/hooks'
+import {
+  useDelegateCallback,
+  useGovernanceToken,
+  useActiveProtocol,
+  useActiveTokenIndex
+} from '../../state/governance/hooks'
 import { useTokenBalance } from '../../state/wallet/hooks'
 import { LoadingView, SubmittedView } from '../ModalViews'
 import { Text } from 'rebass'
@@ -69,6 +74,7 @@ export default function DelegateModal({ isOpen, onDismiss, title }: VoteModalPro
   const { address: parsedAddress } = useENS(activeDelegate)
 
   const [activeProtocol] = useActiveProtocol()
+  const [activeTokenIndex] = useActiveTokenIndex()
 
   const govToken = useGovernanceToken()
 
@@ -114,7 +120,8 @@ export default function DelegateModal({ isOpen, onDismiss, title }: VoteModalPro
               <StyledClosed stroke="black" onClick={wrappedOndismiss} />
             </RowBetween>
             <TYPE.body>
-              {activeProtocol?.token?.symbol} tokens represent voting shares in {activeProtocol?.name}.
+              {activeProtocol?.tokens[activeTokenIndex]?.symbol} tokens represent voting shares in{' '}
+              {activeProtocol?.name}.
             </TYPE.body>
             <TYPE.body>
               You can either vote on each proposal yourself or delegate your votes to a third party.

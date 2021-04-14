@@ -92,6 +92,11 @@ export function useGovernanceContract(): Contract | null {
   )
 }
 
+export function useIsAave(): boolean {
+  const [activeProtocol] = useActiveProtocol()
+  return activeProtocol?.id === AAVE_GOVERNANCE.id
+}
+
 export function useGovTokenContract(): Contract | null {
   const govToken = useGovernanceToken()
   const isAave = useIsAave()
@@ -100,9 +105,4 @@ export function useGovTokenContract(): Contract | null {
 
 export function useAutonomousContract(tokenAddress?: string): Contract | null {
   return useContract(tokenAddress ?? undefined, AUTONOMOUS_ABI, true)
-}
-
-export function useIsAave(): boolean {
-  const [activeProtocol] = useActiveProtocol()
-  return activeProtocol?.id === AAVE_GOVERNANCE.id
 }

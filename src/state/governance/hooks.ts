@@ -1,8 +1,9 @@
-import { updateLastSelectedProtocolID } from './../user/actions'
+import { updateLastSelectedProtocolID, updateLastSelectedTokenIndex } from './../user/actions'
 import { TransactionResponse } from '@ethersproject/providers'
 import { TokenAmount, Token, Percent } from '@uniswap/sdk'
 import {
   updateActiveProtocol,
+  updateActiveToken,
   updateFilterActive,
   updateTopDelegates,
   updateVerifiedDelegates,
@@ -57,6 +58,22 @@ export function useActiveProtocol(): [GovernanceInfo | undefined, (activeProtoco
   return [activeProtocol, setActiveProtocol]
 }
 
+export function useActiveTokenIndex(): [number, (activeTokenIndex: number) => void] {
+  const dispatch = useDispatch<AppDispatch>()
+  const activeTokenIndex = useSelector<AppState, AppState['governance']['activeTokenIndex']>(state => {
+    return state.governance.activeTokenIndex
+  })
+
+  const setActiveTokenIndex = useCallback(
+    (activeTokenIndex: number) => {
+      dispatch(updateActiveToken({ activeTokenIndex }))
+      dispatch(updateLastSelectedTokenIndex({ tokenIndex: activeTokenIndex }))
+    },
+    [dispatch]
+  )
+  return [activeTokenIndex, setActiveTokenIndex]
+}
+
 export function useFilterActive(): [boolean, (filterActive: boolean) => void] {
   const dispatch = useDispatch<AppDispatch>()
   const filterActive = useSelector<AppState, AppState['governance']['filterActive']>(state => {
@@ -75,7 +92,8 @@ export function useFilterActive(): [boolean, (filterActive: boolean) => void] {
 export function useGovernanceToken(): Token | undefined {
   const { chainId } = useActiveWeb3React()
   const [activeProtocol] = useActiveProtocol()
-  return chainId && activeProtocol ? deserializeToken(activeProtocol.token) : undefined
+  const [activeTokenIndex] = useActiveTokenIndex()
+  return chainId && activeProtocol ? deserializeToken(activeProtocol.tokens[activeTokenIndex]) : undefined
 }
 
 // @todo add typed query response

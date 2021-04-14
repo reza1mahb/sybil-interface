@@ -3,6 +3,7 @@ import { SerializedToken } from './../user/actions'
 import { ChainId, Token } from '@uniswap/sdk'
 import {
   updateActiveProtocol,
+  updateActiveToken,
   updateFilterActive,
   updateTopDelegates,
   updateVerifiedDelegates,
@@ -23,7 +24,7 @@ export interface GovernanceInfo {
   logo: string
   primaryColor: string
   secondaryColor: string
-  token: SerializedToken
+  tokens: SerializedToken[] // Primary token should be first
   governanceAddress: string
   social: string
   emoji?: string
@@ -49,7 +50,7 @@ export const UNISWAP_GOVERNANCE: GovernanceInfo = {
   logo: UniLogo,
   primaryColor: '#FF007A',
   secondaryColor: '#FDEEF5',
-  token: serializeToken(UNI),
+  tokens: [serializeToken(UNI)],
   governanceAddress: UNI_GOVERNANCE_ADDRESS,
   social: '@UniswapProtocol',
   emoji: '🦄'
@@ -65,7 +66,7 @@ export const COMPOUND_GOVERNANCE: GovernanceInfo = {
   logo: CompLogo,
   primaryColor: '#00D395',
   secondaryColor: '#f0fffa',
-  token: serializeToken(COMP),
+  tokens: [serializeToken(COMP)],
   governanceAddress: COMP_GOVERNANCE_ADDRESS,
   social: '@compoundfinance',
   emoji: '🏦'
@@ -73,7 +74,9 @@ export const COMPOUND_GOVERNANCE: GovernanceInfo = {
 
 export const AAVE_GOVERNANCE_ADDRESS = '0xEC568fffba86c094cf06b22134B23074DFE2252c'
 export const AAVE_ADDRESS = '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9'
+export const STK_AAVE_ADDRESS = '0x4da27a545c0c5B758a6BA100e3a049001de870f5'
 const AAVE = new Token(ChainId.MAINNET, AAVE_ADDRESS, 18, 'AAVE', 'Aave Token')
+const stkAAVE = new Token(ChainId.MAINNET, STK_AAVE_ADDRESS, 18, 'stkAAVE', 'Stake Aave Token')
 
 export const AAVE_GOVERNANCE: GovernanceInfo = {
   id: 'aave',
@@ -81,7 +84,7 @@ export const AAVE_GOVERNANCE: GovernanceInfo = {
   logo: AaveLogo,
   primaryColor: '#B6509E',
   secondaryColor: '#ebfeff',
-  token: serializeToken(AAVE),
+  tokens: [serializeToken(AAVE), serializeToken(stkAAVE)],
   governanceAddress: AAVE_GOVERNANCE_ADDRESS,
   social: '@AaveAave',
   emoji: '👻'
@@ -97,7 +100,7 @@ export const POOL_TOGETHER_GOVERNANCE: GovernanceInfo = {
   logo: PoolLogo,
   primaryColor: '#5c0ef3',
   secondaryColor: '#f2eeff',
-  token: serializeToken(POOL),
+  tokens: [serializeToken(POOL)],
   governanceAddress: POOL_TOGETHER_GOVERNANCE_ADDRESS,
   social: '@PoolTogether_',
   emoji: '🏆'
@@ -113,7 +116,7 @@ export const RADICLE_GOVERNANCE: GovernanceInfo = {
   logo: RadicleLogo,
   primaryColor: '#5555FF',
   secondaryColor: '#E3E3FF',
-  token: serializeToken(RADICLE),
+  tokens: [serializeToken(RADICLE)],
   governanceAddress: RADICLE_GOVERNANCE_ADDRESS,
   social: '@radicle',
   emoji: '🌱'
@@ -133,6 +136,9 @@ export const FETCHING_INTERVAL = 50
 export interface GovernanceState {
   // the selected option from supported protocol options
   activeProtocol: GovernanceInfo | undefined
+
+  // the selected option from available gov tokens
+  activeTokenIndex: number
 
   // filter only verified delegates
   filterActive: boolean
@@ -159,6 +165,7 @@ export interface GovernanceState {
 
 export const initialState: GovernanceState = {
   activeProtocol: undefined,
+  activeTokenIndex: 0,
   filterActive: false,
 
   // top delegates and pagination details
@@ -173,6 +180,9 @@ export default createReducer(initialState, builder =>
   builder
     .addCase(updateActiveProtocol, (state, action) => {
       state.activeProtocol = action.payload.activeProtocol
+    })
+    .addCase(updateActiveToken, (state, action) => {
+      state.activeTokenIndex = action.payload.activeTokenIndex
     })
     .addCase(updateFilterActive, (state, action) => {
       state.filterActive = action.payload.filterActive
